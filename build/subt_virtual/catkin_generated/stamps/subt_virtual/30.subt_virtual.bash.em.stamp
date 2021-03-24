@@ -1,0 +1,18 @@
+# generated from subt_virtual/env-hooks/30.subt_virtual.bash.em
+
+@[if DEVELSPACE]@
+. "@(CMAKE_CURRENT_SOURCE_DIR)/subt_virtual.bash"
+export IGN_GAZEBO_RESOURCE_PATH="@(CMAKE_CURRENT_SOURCE_DIR)/worlds:$IGN_GAZEBO_RESOURCE_PATH"
+# not until https://github.com/ignitionrobotics/ign-launch/issues/92 is fixed
+#export IGN_LAUNCH_CONFIG_PATH="@(CMAKE_CURRENT_SOURCE_DIR)/launch:$IGN_LAUNCH_CONFIG_PATH"
+@[else]@
+if [ -z "$CATKIN_ENV_HOOK_WORKSPACE" ]; then
+  CATKIN_ENV_HOOK_WORKSPACE="@(CMAKE_INSTALL_PREFIX)"
+fi
+. "$CATKIN_ENV_HOOK_WORKSPACE/share/subt_virtual/subt_virtual.bash"
+export IGN_GAZEBO_RESOURCE_PATH="@(CMAKE_INSTALL_PREFIX)/share/subt_virtual/worlds:$IGN_GAZEBO_RESOURCE_PATH"
+# not until https://github.com/ignitionrobotics/ign-launch/issues/92 is fixed
+# export IGN_LAUNCH_CONFIG_PATH="@(CMAKE_INSTALL_PREFIX)/share/subt_virtual/launch:$IGN_LAUNCH_CONFIG_PATH"
+@[end if]@
+
+export IGN_TRANSPORT_TOPIC_STATISTICS=1

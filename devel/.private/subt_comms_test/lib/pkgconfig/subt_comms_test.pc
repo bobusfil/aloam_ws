@@ -1,0 +1,8 @@
+prefix=/home/admin-vras/aloam_ws/devel/.private/subt_comms_test
+
+Name: subt_comms_test
+Description: Description of subt_comms_test
+Version: 0.1.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: subt_communication_broker

@@ -1,0 +1,180 @@
+#!/usr/bin/env python
+
+from threading import Lock
+
+import numpy as np
+
+from collections import deque
+from math import degrees, radians
+
+import rospy
+from stamped_msgs.msg import Bool
+from geometry_msgs.msg import Twist
+from sensor_msgs.msg import Imu
+
+from tf.transformations import euler_from_quaternion
+
+
+def sign(x):
+    if x >= 0:
+        return 1
+    return -1
+
+
+class HuskySafetyController(object):
+    """
+    Husky safety controller. It just checks filtered roll and pitch and in case they are too high, drives a bit backward.
+    It is intended to be "laid between" the planner and the robot's cmd_vel interface.
+    """
+    def __init__(self):
+        self._lock = Lock()
+
+        fast_history_length = rospy.get_param("~fast_history_length", 20)
+        slow_history_length = rospy.get_param("~slow_history_length", 200)
+        self._max_roll = rospy.get_param("~max_roll", radians(30.0))
+        self._max_pitch = rospy.get_param("~max_pitch", radians(40.0))
+        self._dangerous_roll = rospy.get_param("~dangerous_roll", radians(20.0))
+        self._dangerous_pitch = rospy.get_param("~dangerous_pitch", radians(30.0))
+        self._rear_velocity = rospy.get_param("~rear_velocity", 0.2)
+        self._dangerous_max_velocity = rospy.get_param("~dangerous_max_velocity", 0.4)
+        self._max_intervention_duration = rospy.Duration(rospy.get_param("~max_intervention_duration", 15.0))
+
+        self._roll_history = deque(maxlen=fast_history_length)
+        self._pitch_history = deque(maxlen=fast_history_length)
+        self._cmdvel_history = deque(maxlen=fast_history_length)
+        self._roll_history_slow = deque(maxlen=slow_history_length)
+        self._pitch_history_slow = deque(maxlen=slow_history_length)
+
+        self._emergency_active = False
+        self._intervention_start_time = rospy.Time(0)
+        self._last_emergency_cmd_time = None
+
+        self._cmdvel_pub = rospy.Publisher("~out_cmd_vel", Twist, queue_size=1)
+        self._emergency_pub = rospy.Publisher("~emergency_control_active", Bool, queue_size=1, latch=True)
+        self._cmdvel_sub = rospy.Subscriber("~in_cmd_vel", Twist, self._in_cmdvel_cb, queue_size=10)
+        self._emergency_cmdvel_sub = rospy.Subscriber("~emergency_cmd_vel", Twist, self._emergency_cmdvel_cb, queue_size=10)
+        self._imu_sub = rospy.Subscriber("imu/data", Imu, self._imu_cb, queue_size=10)
+
+    def _emergency_cmdvel_cb(self, msg):
+        self._cmdvel_pub.publish(msg)
+        self._last_emergency_cmd_time = rospy.Time.now()
+
+    def _in_cmdvel_cb(self, msg):
+        assert isinstance(msg, Twist)
+        if not self._emergency_active:
+            with self._lock:
+                self._cmdvel_history.append(msg.linear.x)
+
+            f_roll = self._get_filtered(self._roll_history)
+            f_pitch = self._get_filtered(self._pitch_history)
+            safe = True
+            if abs(f_roll) > self._dangerous_roll:
+                rospy.logerr_throttle(1.0, "Dangerous roll (%f deg), slowing down" % degrees(f_roll), logger_name="husky_safety_controller")
+                safe = False
+            if abs(f_pitch) > self._dangerous_pitch:
+                rospy.logerr_throttle(1.0, "Dangerous pitch (%f deg), slowing down" % degrees(f_pitch), logger_name="husky_safety_controller")
+                safe = False
+
+            if not safe:
+                msg.linear.x = min(self._dangerous_max_velocity, abs(msg.linear.x)) * sign(msg.linear.x)
+
+            if self._last_emergency_cmd_time is None or self._last_emergency_cmd_time + rospy.Duration(1) < rospy.Time.now():
+                self._cmdvel_pub.publish(msg)
+
+    def _imu_cb(self, msg):
+        assert isinstance(msg, Imu)
+        roll, pitch, _ = euler_from_quaternion([msg.orientation.x, msg.orientation.y, msg.orientation.z, msg.orientation.w])
+        with self._lock:
+            self._roll_history.append(roll)
+            self._roll_history_slow.append(roll)
+            self._pitch_history.append(pitch)
+            self._pitch_history_slow.append(pitch)
+
+        f_roll = self._get_filtered(self._roll_history)
+        f_pitch = self._get_filtered(self._pitch_history)
+        f_roll_slow = self._get_filtered(self._roll_history_slow)
+        f_pitch_slow = self._get_filtered(self._pitch_history_slow)
+
+        emergency = False
+        if abs(f_roll) > self._max_roll or abs(f_roll_slow) > self._max_roll:
+            rospy.logerr_throttle(1.0, "Unsafe roll (%f deg)" % degrees(f_roll), logger_name="husky_safety_controller")
+            emergency = True
+        if abs(f_pitch) > self._max_pitch or abs(f_pitch_slow) > self._max_pitch:
+            rospy.logerr_throttle(1.0, "Unasfe pitch (%f deg)" % degrees(f_pitch), logger_name="husky_safety_controller")
+            emergency = True
+
+        if self._emergency_active and not emergency:
+            msg = Bool()
+            msg.data = False
+            msg.header.stamp = rospy.Time.now()
+            self._emergency_pub.publish(msg)
+            rospy.logwarn("Safe pose again", logger_name="husky_safety_controller")
+
+        if not emergency:
+            self._emergency_active = False
+            return
+
+        # emergency=True here; we first check if we can start intervention
+        if not self._emergency_active:  # here emergency=True holds
+            if not self._can_start_intervention():
+                # if we're in emergency state but intervention is not allowed, there's nothing more to do, we have to
+                # wait until we're allowed to intervent again (or better hope it isn't needed anymore)
+                rospy.logwarn("Unsafe pose, but emergency intervention is on cooldown", logger_name="husky_safety_controller")
+                return
+
+        if not self._emergency_active:
+            msg = Bool()
+            msg.data = True
+            msg.header.stamp = rospy.Time.now()
+            self._emergency_pub.publish(msg)
+            rospy.logwarn("Unsafe pose, taking control of the robot for the next %i seconds", self._max_intervention_duration.secs, logger_name="husky_safety_controller")
+            self._intervention_start_time = rospy.Time.now()
+
+        if self._emergency_active and not self._is_intervention_allowed():
+            msg = Bool()
+            msg.data = False
+            msg.header.stamp = rospy.Time.now()
+            self._emergency_pub.publish(msg)
+            rospy.logwarn("Emergency intervention duration is over, putting it on cooldown", logger_name="husky_safety_controller")
+            self._emergency_active = False
+            return
+
+        self._emergency_active = self._is_intervention_allowed()
+        if not self._is_intervention_allowed():
+            return
+
+        direction = self._get_driving_direction()
+        msg = Twist()
+        msg.linear.x = -direction * self._rear_velocity
+        self._cmdvel_pub.publish(msg)
+
+    def _can_start_intervention(self):
+        return rospy.Time.now() - self._intervention_start_time > self._max_intervention_duration * 2
+
+    def _is_intervention_allowed(self):
+        return rospy.Time.now() - self._intervention_start_time <= self._max_intervention_duration
+
+    def _get_filtered(self, history):
+        with self._lock:
+            if len(history) < history.maxlen:
+                return 0.0
+            data = np.array(history)
+        return np.average(np.abs(data))
+
+    def _get_driving_direction(self):
+        with self._lock:
+            if len(self._cmdvel_history) < self._cmdvel_history.maxlen:
+                return 1
+            data = np.array(self._cmdvel_history)
+        return 1 if np.average(data) >= 0 else -1
+
+
+if __name__ == '__main__':
+    rospy.init_node("husky_safety_controller")
+
+    controller = HuskySafetyController()
+
+    try:
+        rospy.spin()
+    except rospy.ROSInterruptException:
+        pass

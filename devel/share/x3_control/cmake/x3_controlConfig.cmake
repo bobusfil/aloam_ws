@@ -1,0 +1,1 @@
+/home/admin-vras/aloam_ws/devel/.private/x3_control/share/x3_control/cmake/x3_controlConfig.cmake

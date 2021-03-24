@@ -1,0 +1,131 @@
+#!/usr/bin/env python2
+import math
+
+import rospy
+from nifti_robot_driver_msgs.msg import FlippersStateStamped, FlippersState, FlipperCommand, FlippersVel
+from std_msgs.msg import Bool, Int32, Float64
+from stamped_msgs.msg import Int32 as Int32Stamped
+from sensor_msgs.msg import JointState
+
+from librover_common_py import *
+
+"""
+This is a shim for flipper control
+"""
+
+
+def flipper_cmd_pos_cb(msg):
+    assert isinstance(msg, FlipperCommand)
+
+    if msg.object_id == indexFromController(Controller_ID_FLIPPER_FRONT_LEFT):
+        fl_pos_pub.publish(Float64(msg.angle))
+    elif msg.object_id == indexFromController(Controller_ID_FLIPPER_FRONT_RIGHT):
+        fr_pos_pub.publish(Float64(msg.angle))
+    elif msg.object_id == indexFromController(Controller_ID_FLIPPER_REAR_LEFT):
+        rl_pos_pub.publish(Float64(msg.angle))
+    elif msg.object_id == indexFromController(Controller_ID_FLIPPER_REAR_RIGHT):
+        rr_pos_pub.publish(Float64(msg.angle))
+
+
+def flippers_cmd_pos_cb(msg):
+    assert isinstance(msg, FlippersState)
+
+    fl_pos_pub.publish(Float64(msg.frontLeft))
+    fr_pos_pub.publish(Float64(msg.frontRight))
+    rl_pos_pub.publish(Float64(msg.rearLeft))
+    rr_pos_pub.publish(Float64(msg.rearRight))
+
+
+def flippers_cmd_vel_cb(msg):
+    assert isinstance(msg, FlippersVel)
+
+    fl_vel_pub.publish(Float64(msg.frontLeft))
+    fr_vel_pub.publish(Float64(msg.frontRight))
+    rl_vel_pub.publish(Float64(msg.rearLeft))
+    rr_vel_pub.publish(Float64(msg.rearRight))
+
+
+def posture_cmd_cb(msg):
+    assert isinstance(msg, Int32) or isinstance(msg, Int32Stamped)
+    posture_idx = msg.data
+    posture = FLIPPER_POSTURES_V[posture_idx]
+    fl_pos_pub.publish(Float64(posture.front))
+    fr_pos_pub.publish(Float64(posture.front))
+    rl_pos_pub.publish(Float64(posture.rear))
+    rr_pos_pub.publish(Float64(posture.rear))
+
+
+def joints_cb(msg):
+    assert isinstance(msg, JointState)
+
+    global joints_msg
+    joints_msg = msg
+
+
+if __name__ == '__main__':
+    rospy.init_node("flipper_controller")
+
+    RoverGetDefaultParams()
+
+    fl_pos_pub = rospy.Publisher("flippers_cmd_pos/front_left", Float64, queue_size=10)
+    fr_pos_pub = rospy.Publisher("flippers_cmd_pos/front_right", Float64, queue_size=10)
+    rl_pos_pub = rospy.Publisher("flippers_cmd_pos/rear_left", Float64, queue_size=10)
+    rr_pos_pub = rospy.Publisher("flippers_cmd_pos/rear_right", Float64, queue_size=10)
+    fl_vel_pub = rospy.Publisher("flippers_cmd_vel/front_left", Float64, queue_size=10)
+    fr_vel_pub = rospy.Publisher("flippers_cmd_vel/front_right", Float64, queue_size=10)
+    rl_vel_pub = rospy.Publisher("flippers_cmd_vel/rear_left", Float64, queue_size=10)
+    rr_vel_pub = rospy.Publisher("flippers_cmd_vel/rear_right", Float64, queue_size=10)
+
+    flippers_state_pub = rospy.Publisher("flippers_state", FlippersStateStamped, queue_size=10)
+    posture_pub = rospy.Publisher("posture", Int32, queue_size=10)
+    posture_stamped_pub = rospy.Publisher("posture_stamped", Int32Stamped, queue_size=10)
+
+    joints_msg = None
+    joints_sub = rospy.Subscriber("joint_state", JointState, joints_cb, queue_size=10)
+
+    flipper_cmd_pos_sub = rospy.Subscriber("flipper_cmd", FlipperCommand, flipper_cmd_pos_cb, queue_size=10)
+    flippers_cmd_pos_sub = rospy.Subscriber("flippers_cmd", FlippersState, flippers_cmd_pos_cb, queue_size=10)
+    flippers_cmd_vel_sub = rospy.Subscriber("flippers_cmd_vel", FlippersVel, flippers_cmd_vel_cb, queue_size=10)
+    posture_cmd_sub = rospy.Subscriber("posture_cmd", Int32, posture_cmd_cb, queue_size=10)
+    posture_stamped_cmd_sub = rospy.Subscriber("posture_cmd_stamped", Int32Stamped, posture_cmd_cb, queue_size=10)
+
+    rate = rospy.Rate(10.0)
+    while not rospy.is_shutdown():
+        if joints_msg is not None:
+            assert isinstance(joints_msg, JointState)
+            msg = FlippersStateStamped()
+            try:
+                msg.header.frame_id = "base_link"
+                msg.header.stamp = joints_msg.header.stamp
+                msg.frontLeft = joints_msg.position[joints_msg.name.index("front_left_flipper_j")]
+                msg.frontRight = joints_msg.position[joints_msg.name.index("front_right_flipper_j")]
+                msg.rearLeft = joints_msg.position[joints_msg.name.index("rear_left_flipper_j")]
+                msg.rearRight = joints_msg.position[joints_msg.name.index("rear_right_flipper_j")]
+                flippers_state_pub.publish(msg)
+
+                # determine posture
+                tol = math.radians(5.0)
+                posture = -1
+                for i in range(len(FLIPPER_POSTURES_V)):
+                    p = FLIPPER_POSTURES_V[i]
+                    if abs(p.front - msg.frontLeft) <= tol and abs(p.front - msg.frontRight) <= tol and \
+                            abs(p.rear - msg.rearLeft) <= tol and abs(p.rear - msg.rearRight) <= tol:
+                        posture = i
+                        break
+
+                postureMsg = Int32()
+                postureMsg.data = posture
+                posture_pub.publish(postureMsg)
+
+                postureStampedMsg = Int32Stamped()
+                postureStampedMsg.header.stamp = joints_msg.header.stamp
+                postureStampedMsg.data = posture
+                posture_stamped_pub.publish(postureStampedMsg)
+            except ValueError:
+                pass
+
+        try:
+            rate.sleep()
+        except rospy.ROSInterruptException:
+            break
+

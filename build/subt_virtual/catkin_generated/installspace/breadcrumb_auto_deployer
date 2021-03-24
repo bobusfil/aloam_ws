@@ -1,0 +1,156 @@
+#!/usr/bin/env python2
+"""
+Breadcrumb auto-deployer monitors location of breadcrumbs and robots.
+A new breadcrumb is deployed if robot distance from already deployed
+breadcrumbs or base exceeds a limit.
+"""
+import numpy as np
+import rospy
+from scipy.spatial import cKDTree
+from std_msgs.msg import Empty, Int16MultiArray, MultiArrayDimension, MultiArrayLayout
+from tf2_ros import Buffer, TransformException, TransformListener
+from threading import RLock
+from cras.static_transform_broadcaster import StaticTransformBroadcaster
+np.set_printoptions(precision=3)
+
+
+def slots(msg):
+    """Return message attributes (slots) as list."""
+    return [getattr(msg, var) for var in msg.__slots__]
+
+
+def msg_to_numpy(msg, use_metadata=False):
+    assert isinstance(msg, Int16MultiArray)
+    if use_metadata:
+        shape = [d.size for d in msg.layout.dim]
+        assert len(shape) == 2
+        assert shape[1] == 3  # N-by-3
+        x = np.array(msg.data, dtype=float).reshape(shape)
+    else:
+        x = np.array(msg.data, dtype=float).reshape((-1, 3))
+    return x
+
+
+def numpy_to_msg(x, use_metadata=False, msg_count=0):
+    msg = Int16MultiArray()
+    if use_metadata:
+        msg.layout.dim.append(MultiArrayDimension('index', x.shape[0], 2 * x.shape[1]))
+        msg.layout.dim.append(MultiArrayDimension('xyz', x.shape[1], 2))
+    elif msg_count > 0:
+        msg.layout.data_offset = msg_count
+    msg.data = x.astype(int).ravel().tolist()
+    return msg
+
+
+class BreadcrumbAutoDeployer(object):
+
+    def __init__(self):
+        self.num_breadcrumbs = rospy.get_param('~num_breadcrumbs', 12)
+        self.num_deployed = 0
+        self.msg_count = 0
+
+        self.map_frame = rospy.get_param('~map_frame', 'subt')
+        teambase_loc = rospy.get_param('~teambase_loc', [0., 0., 0.])
+        self.teambase_loc = np.array(teambase_loc).reshape((1, 3))
+        self.robot = rospy.get_param('~robot', None)
+        assert self.robot
+        self.robot_frame = rospy.get_param('~robot_frame', '%s/base_link' % self.robot)
+        self.robots = rospy.get_param('~robots', [])
+        if isinstance(self.robots, str):
+            self.robots = self.robots.split(',')
+        self.deploy_dist = rospy.get_param('~deploy_dist', 50.)
+        # Aggregate and publish information from all robots? If true, lists
+        # are maintained per sender and the node publishes their union.
+        self.publish_all = rospy.get_param('~publish_all', True)
+        self.use_metadata = rospy.get_param('~use_metadata', False)
+
+        self.deployed_lock = RLock()
+        self.deployed = {'teambase': self.teambase_loc,
+                         self.robot: np.zeros((0, 3))}
+        self.deployed_arr = None
+        self.deployed_index = None
+        self.rebuild_index()
+
+        self.deploy_pub = rospy.Publisher("breadcrumb/deploy", Empty, queue_size=5)
+        self.deployed_pub = rospy.Publisher('deployed_breadcrumbs', Int16MultiArray, queue_size=5, latch=True)
+        self.tf_pub = StaticTransformBroadcaster()
+
+        self.deploy_sub = rospy.Subscriber('append_deployed_breadcrumbs', Int16MultiArray,
+                                           self.append_deployed_breadcrumbs_cb, queue_size=5)
+        self.tf = Buffer(rospy.Duration.from_sec(15.))
+        self.tf_sub = TransformListener(self.tf)
+
+        self.deployed_subs = {}
+        for robot in self.robots:
+            if robot == self.robot:
+                continue
+            sub = rospy.Subscriber('/%s/deployed_breadcrumbs' % robot, Int16MultiArray,
+                                   lambda msg, robot=robot: self.deployed_breadcrumbs_cb(msg, robot),
+                                   queue_size=5)
+            self.deployed_subs[robot] = sub
+
+        self.timer = rospy.Timer(rospy.Duration.from_sec(3.), self.maybe_deploy)
+
+    def append_deployed_breadcrumbs_cb(self, msg):
+        x = msg_to_numpy(msg, self.use_metadata)
+        rospy.loginfo('Appending deployed breadcrumbs:\n%s.', x)
+        with self.deployed_lock:
+            self.deployed[self.robot] = np.concatenate((self.deployed[self.robot], x), axis=0)
+            self.rebuild_index()
+
+    def rebuild_index(self):
+        with self.deployed_lock:
+            self.deployed_arr = np.unique(np.concatenate(self.deployed.values(), axis=0), axis=0)
+            self.deployed_index = cKDTree(self.deployed_arr)
+
+    def maybe_deploy(self, evt):
+        try:
+            tf = self.tf.lookup_transform(self.map_frame, self.robot_frame, rospy.Time(0))
+        except TransformException as ex:
+            rospy.logerr('Transform from %s to %s not found: %s.', self.robot_frame, self.map_frame, ex)
+            return
+        pos = np.array(slots(tf.transform.translation)).reshape((1, 3))
+        with self.deployed_lock:
+            d, i = self.deployed_index.query(pos)
+            d, i = d.item(), i.item()
+            rospy.loginfo('%s is %.1f m from the nearest breadcrumb at %s.',
+                          self.robot, d, self.deployed_arr[i])
+            if d >= self.deploy_dist:
+                if self.num_deployed >= self.num_breadcrumbs:
+                    rospy.loginfo('No breadcrumbs left.')
+                else:
+                    self.deploy_pub.publish(Empty())
+                    rospy.loginfo('Breadcrumb %i deployed at %s.', self.num_deployed, pos[0])
+                    self.deployed[self.robot] = np.concatenate((self.deployed[self.robot], pos.round()), axis=0)
+                    self.rebuild_index()
+                    tf.child_frame_id = '%s/breadcrumb_%i' % (self.robot, self.num_deployed)
+                    self.tf_pub.sendTransform(tf)
+                    self.num_deployed += 1
+            self.publish_deployed()
+
+    def deployed_breadcrumbs_cb(self, msg, robot):
+        x = msg_to_numpy(msg, self.use_metadata)
+        rospy.loginfo('Positions of %i deployed breadcrumbs from %s received:\n%s.',
+                      x.shape[0], robot, x)
+        with self.deployed_lock:
+            self.deployed[robot] = x
+            self.rebuild_index()
+
+    def publish_deployed(self):
+        with self.deployed_lock:
+            if self.publish_all:
+                x = self.deployed_arr
+            else:
+                x = self.deployed[self.robot]
+        msg = numpy_to_msg(x, self.use_metadata, self.msg_count)
+        self.msg_count = self.msg_count + 1
+        self.deployed_pub.publish(msg)
+
+
+if __name__ == '__main__':
+    rospy.init_node("breadcrumb_auto_deployer")
+    node = BreadcrumbAutoDeployer()
+    try:
+        rospy.spin()
+    except rospy.ROSInterruptException:
+        pass

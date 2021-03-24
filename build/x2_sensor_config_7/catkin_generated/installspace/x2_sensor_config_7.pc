@@ -1,0 +1,8 @@
+prefix=/home/admin-vras/aloam_ws/install
+
+Name: x2_sensor_config_7
+Description: Description of x2_sensor_config_7
+Version: 0.1.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

@@ -1,0 +1,1 @@
+/home/admin-vras/aloam_ws/devel/.private/x3_control/lib/pkgconfig/x3_control.pc

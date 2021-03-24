@@ -1,0 +1,1 @@
+/home/admin-vras/aloam_ws/devel/.private/x1_control/share/x1_control/cmake/x1_controlConfig-version.cmake

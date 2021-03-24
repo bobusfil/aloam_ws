@@ -1,0 +1,68 @@
+#!/usr/bin/env python2
+
+import rospy
+from sensor_msgs.msg import BatteryState, JointState
+from nifti_robot_driver_msgs.msg import RobotStatusStamped
+
+from librover_common_py import BAT_FULL_VOLTAGE
+
+"""
+This is a shim for publishing robot_status in simulation.
+"""
+
+has_battery = False
+has_joints = False
+
+robot_status = RobotStatusStamped()
+robot_status.header.frame_id = "base_link"
+robot_status.battery_status = 1
+robot_status.brake_on = True
+robot_status.emergency_stop_on = False
+# following values are taken from a random time instant in a random bag from the real robot
+robot_status.controllers_status.core = 37520
+robot_status.controllers_status.track_left = 16798992
+robot_status.controllers_status.track_right = 33576208
+robot_status.controllers_status.flipper_front_left = 83899024
+robot_status.controllers_status.flipper_front_right = 67121808
+robot_status.controllers_status.flipper_rear_left = 50344592
+robot_status.controllers_status.flipper_rear_right = 16790160
+
+
+def battery_cb(battery_msg):
+    assert isinstance(battery_msg, BatteryState)
+    robot_status.battery_level = battery_msg.percentage * BAT_FULL_VOLTAGE
+    global has_battery
+    has_battery = True
+
+
+def joints_cb(joints_msg):
+    assert isinstance(joints_msg, JointState)
+    try:
+        idx = joints_msg.name.index("laser_j")
+        robot_status.scanning_speed = abs(joints_msg.velocity[idx])
+        if robot_status.scanning_speed < 1e-6:
+            robot_status.scanning_speed = 0
+        global has_joints
+        has_joints = True
+    except ValueError:
+        pass
+
+
+if __name__ == '__main__':
+    rospy.init_node("robot_status")
+
+    pub = rospy.Publisher("robot_status", RobotStatusStamped, queue_size=1)
+
+    battery_sub = rospy.Subscriber("battery_state", BatteryState, battery_cb, queue_size=1)
+    joints_sub = rospy.Subscriber("joint_state", JointState, joints_cb, queue_size=1)
+
+    rate = rospy.Rate(10.0)
+    while not rospy.is_shutdown():
+        if has_joints and has_battery:
+            robot_status.header.stamp = rospy.Time.now()
+            pub.publish(robot_status)
+
+        try:
+            rate.sleep()
+        except rospy.ROSInterruptException:
+            break

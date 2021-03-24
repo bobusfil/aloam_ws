@@ -1,0 +1,34 @@
+#!/usr/bin/env python2
+"""
+Split localization hypotheses into batches with limited size.
+"""
+from darpa_msgs.msg import LocalizationHypotheses
+import rospy
+
+
+class HypothesesSplitter(object):
+    def __init__(self):
+        self.batch_size = rospy.get_param('~batch_size', 6)
+        self.erase_image_data = rospy.get_param('~erase_image_data', True)
+
+        self.hypotheses_pub = rospy.Publisher("hypotheses_batch", LocalizationHypotheses,
+                                              queue_size=1000)
+        self.hypotheses_sub = rospy.Subscriber("hypotheses", LocalizationHypotheses, self.hypotheses_cb,
+                                               queue_size=10)
+
+    def hypotheses_cb(self, msg):
+        if self.erase_image_data:
+            for h in msg.hypotheses:
+                h.image.data = []
+        for i in range(0, len(msg.hypotheses), self.batch_size):
+            batch = LocalizationHypotheses(msg.header, msg.hypotheses[i:i + self.batch_size])
+            self.hypotheses_pub.publish(batch)
+
+
+if __name__ == '__main__':
+    rospy.init_node("hypotheses_splitter")
+    node = HypothesesSplitter()
+    try:
+        rospy.spin()
+    except rospy.ROSInterruptException:
+        pass

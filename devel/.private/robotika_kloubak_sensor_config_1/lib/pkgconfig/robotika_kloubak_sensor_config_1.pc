@@ -1,0 +1,8 @@
+prefix=/home/admin-vras/aloam_ws/devel/.private/robotika_kloubak_sensor_config_1
+
+Name: robotika_kloubak_sensor_config_1
+Description: Description of robotika_kloubak_sensor_config_1
+Version: 0.0.1
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

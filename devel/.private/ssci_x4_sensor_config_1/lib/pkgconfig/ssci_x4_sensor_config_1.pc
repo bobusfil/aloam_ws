@@ -1,0 +1,8 @@
+prefix=/home/admin-vras/aloam_ws/devel/.private/ssci_x4_sensor_config_1
+
+Name: ssci_x4_sensor_config_1
+Description: Description of ssci_x4_sensor_config_1
+Version: 0.1.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

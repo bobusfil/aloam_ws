@@ -1,0 +1,8 @@
+prefix=/home/admin-vras/aloam_ws/devel/.private/subt_msgs
+
+Name: subt_msgs
+Description: Description of subt_msgs
+Version: 0.1.0
+Cflags: -I/home/admin-vras/aloam_ws/devel/.private/subt_msgs/include
+Libs: -L${prefix}/lib 
+Requires: geometry_msgs message_runtime std_msgs

@@ -1,0 +1,8 @@
+prefix=/home/admin-vras/aloam_ws/devel/.private/x2_control
+
+Name: x2_control
+Description: Description of x2_control
+Version: 0.0.1
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

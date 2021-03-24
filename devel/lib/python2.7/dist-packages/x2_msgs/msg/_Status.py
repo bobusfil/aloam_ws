@@ -1,0 +1,1 @@
+/home/admin-vras/aloam_ws/devel/.private/x2_msgs/lib/python2.7/dist-packages/x2_msgs/msg/_Status.py

@@ -1,0 +1,8 @@
+CMakeFiles/alaserMapping.dir/src/gtComparator.cpp.o: In function `main':
+/home/admin-vras/aloam_ws/src/A-LOAM/src/gtComparator.cpp:13: multiple definition of `main'
+CMakeFiles/alaserMapping.dir/src/laserMapping.cpp.o:/home/admin-vras/aloam_ws/src/A-LOAM/src/laserMapping.cpp:908: first defined here
+collect2: error: ld returned 1 exit status
+make[2]: *** [/home/admin-vras/aloam_ws/devel/.private/aloam_velodyne/lib/aloam_velodyne/alaserMapping] Error 1
+make[1]: *** [CMakeFiles/alaserMapping.dir/all] Error 2
+make[1]: *** Waiting for unfinished jobs....
+make: *** [all] Error 2

@@ -1,0 +1,1 @@
+/home/admin-vras/aloam_ws/devel/.private/cerberus_anymal_c_sensor_config_1/lib/pkgconfig/cerberus_anymal_c_sensor_config_1.pc

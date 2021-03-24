@@ -1,0 +1,80 @@
+#!/usr/bin/env python
+
+import rospy
+from std_msgs.msg import String
+from subt_msgs.srv import PoseFromArtifact, PoseFromArtifactRequest, PoseFromArtifactResponse
+from geometry_msgs.msg import PoseStamped, TransformStamped, Transform
+from tf2_ros import StaticTransformBroadcaster, Buffer, TransformListener, TransformException
+from ros_numpy import numpify, msgify
+
+import numpy as np
+
+"""
+This is a shim for locating the robot in subt frame
+"""
+
+
+if __name__ == '__main__':
+    rospy.init_node("subt_frame_publisher")
+
+    robot_name = rospy.get_param("~robot_name")
+
+    pub = StaticTransformBroadcaster()
+
+    has_service = False
+    while not has_service and not rospy.is_shutdown():
+        try:
+            rospy.wait_for_service("/subt/pose_from_artifact_origin", timeout=rospy.Duration(10))
+            has_service = True
+        except rospy.ROSException:
+            rospy.logwarn("Service /subt/pose_from_artifact_origin is not available, is the simulator and bridge running?")
+
+    service = rospy.ServiceProxy("/subt/pose_from_artifact_origin", PoseFromArtifact)
+
+    buffer = Buffer()
+    listener = TransformListener(buffer)
+
+    map_frame = "%s/map" % (robot_name,)
+    base_frame = "%s/base_link" % (robot_name,)
+
+    while not rospy.is_shutdown():
+        ok, err = buffer.can_transform(map_frame, base_frame, rospy.Time(0), rospy.Duration(1), return_debug_tuple=True)
+        if ok:
+            break
+        else:
+            rospy.logwarn_throttle(10, "Waiting for frame " + map_frame + ". Last error: " + str(err))
+
+    subt_to_map = None
+    while subt_to_map is None and not rospy.is_shutdown():
+        try:
+            resp = service(PoseFromArtifactRequest(String(robot_name)))
+            assert isinstance(resp, PoseFromArtifactResponse)
+
+            time = resp.pose.header.stamp
+            subt_to_base = numpify(resp.pose.pose)
+
+            ok, err = buffer.can_transform(map_frame, base_frame, time, rospy.Duration(10), return_debug_tuple=True)
+            if ok:
+                map_to_base = buffer.lookup_transform(map_frame, base_frame, time, rospy.Duration(1))
+                assert isinstance(map_to_base, TransformStamped)
+                map_to_base = numpify(map_to_base.transform)
+                subt_to_map = msgify(Transform, np.dot(subt_to_base, np.linalg.inv(map_to_base)))
+            else:
+                raise TransformException(err)
+        except Exception, e:
+            rospy.logerr_throttle(10, "Cannot determine subt->" + map_frame + " transform because of error " + str(type(e)) + ": " + str(e))
+            rospy.sleep(rospy.Duration(1))
+
+    rospy.logwarn("!!! Found transform subt->%s/map:\n%s" % (robot_name, str(subt_to_map)))
+
+    transform = TransformStamped()
+    transform.child_frame_id = map_frame
+    transform.header.frame_id = "subt"
+    transform.transform = subt_to_map
+
+    pub.sendTransform(transform)
+
+    try:
+        rospy.spin()
+    except rospy.ROSInterruptException:
+        pass

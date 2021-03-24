@@ -1,0 +1,1 @@
+/home/admin-vras/aloam_ws/devel/.private/marble_husky_sensor_config_2/share/marble_husky_sensor_config_2/cmake/marble_husky_sensor_config_2Config-version.cmake

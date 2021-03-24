@@ -1,0 +1,1 @@
+/home/admin-vras/aloam_ws/devel/.private/subt_virtual/etc/catkin/profile.d/30.subt_virtual.bash

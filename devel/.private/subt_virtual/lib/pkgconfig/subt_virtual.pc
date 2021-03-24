@@ -1,0 +1,8 @@
+prefix=/home/admin-vras/aloam_ws/devel/.private/subt_virtual
+
+Name: subt_virtual
+Description: Description of subt_virtual
+Version: 1.0.0
+Cflags: -I/home/admin-vras/aloam_ws/devel/.private/subt_virtual/include -I/home/admin-vras/aloam_ws/src/subt_virtual/include
+Libs: -L${prefix}/lib -lshared_comms_client
+Requires: message_runtime rosbash subt_msgs

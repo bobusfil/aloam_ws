@@ -1,0 +1,39 @@
+#!/usr/bin/env python2
+
+import importlib
+import functools
+import rospy
+
+
+"""
+This is a shim for providing services on whose presence other nodes depend but their functionality is not essential in
+simulation.
+"""
+
+
+def cb(_):
+    if message != "":
+        rospy.logwarn(message)
+    return service_return()
+
+
+if __name__ == '__main__':
+    rospy.init_node("unimplemented_service")
+
+    name = rospy.get_param("~name")
+    pkg = rospy.get_param("~pkg")
+    type = rospy.get_param("~type")
+    message = rospy.get_param("~message", "Service %s is not implemented." % (name,))
+
+    module = importlib.import_module(pkg + ".srv")
+    srv_type = getattr(module, type)
+    response_type = getattr(module, type + "Response")
+
+    service_return = functools.partial(response_type, *rospy.get_param("~service_return_args", []))
+
+    server = rospy.Service(name, srv_type, cb)
+
+    try:
+        rospy.spin()
+    except rospy.ROSInterruptException:
+        pass

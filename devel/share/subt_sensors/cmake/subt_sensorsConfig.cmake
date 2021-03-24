@@ -1,0 +1,1 @@
+/home/admin-vras/aloam_ws/devel/.private/subt_sensors/share/subt_sensors/cmake/subt_sensorsConfig.cmake

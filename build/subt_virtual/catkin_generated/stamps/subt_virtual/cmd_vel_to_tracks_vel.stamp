@@ -1,0 +1,72 @@
+#!/usr/bin/env python
+
+"""
+This node is a helper for simulated robot which can only be controlled via cmd_vel and doesn't
+offer a tracks_vel interface.
+"""
+from threading import Lock
+
+import rospy
+from std_msgs.msg import Float64
+from geometry_msgs.msg import Twist
+from nifti_robot_driver_msgs.msg import TracksStamped
+
+from librover_common_py import *
+
+
+kinematics = Kinematics2D(RoverGetDefaultParams())
+
+lock = Lock()
+vl_hist = [0.0]
+vr_hist = [0.0]
+last_msg = None
+
+
+def steering_cb(steering_efficiency):
+    assert isinstance(steering_efficiency, Float64)
+    kinematics.setSteeringEfficiency(steering_efficiency.data)
+
+
+def cmd_vel_cb(cmd_vel):
+    assert isinstance(cmd_vel, Twist)
+    vl, vr = kinematics.twistToTracks(cmd_vel.linear.x, cmd_vel.angular.z)
+    with lock:
+        vl_hist.append(vl)
+        vr_hist.append(vr)
+
+
+if __name__ == '__main__':
+    rospy.init_node('tracks_vel_to_cmd_vel')
+
+    pub = rospy.Publisher("tracks_vel", TracksStamped, queue_size=10)
+
+    kinematics.setSteeringEfficiency(rospy.get_param("steering_efficiency", 0.5))
+
+    freq = rospy.get_param("~publish_frequency", 15.0)
+
+    cmd_vel_sub = rospy.Subscriber("cmd_vel", Twist, cmd_vel_cb, queue_size=10)
+    steering_sub = rospy.Subscriber("steering_efficiency", Float64, steering_cb, queue_size=1)
+
+    rate = rospy.Rate(freq)
+    while not rospy.is_shutdown():
+        try:
+            with lock:
+                if len(vl_hist) == 0 and last_msg is not None:
+                    last_msg.header.stamp = rospy.Time.now()
+                elif len(vl_hist) > 0:
+                    avg_vl = sum(vl_hist) / len(vl_hist)
+                    avg_vr = sum(vr_hist) / len(vr_hist)
+                    if last_msg is None:
+                        last_msg = TracksStamped()
+                    last_msg.header.stamp = rospy.Time.now()
+                    last_msg.left = avg_vl
+                    last_msg.right = avg_vr
+                    vl_hist = []
+                    vr_hist = []
+
+            if last_msg is not None:
+                pub.publish(last_msg)
+
+            rate.sleep()
+        except rospy.ROSInterruptException:
+            break

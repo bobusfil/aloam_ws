@@ -1,0 +1,1 @@
+/home/admin-vras/aloam_ws/devel/.private/cerberus_anymal_b_sensor_config_2/share/cerberus_anymal_b_sensor_config_2/cmake/cerberus_anymal_b_sensor_config_2Config-version.cmake

@@ -1,0 +1,1 @@
+/home/admin-vras/aloam_ws/devel/.private/explorer_r3_sensor_config_2/lib/pkgconfig/explorer_r3_sensor_config_2.pc

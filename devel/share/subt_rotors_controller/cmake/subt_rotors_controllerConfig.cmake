@@ -1,0 +1,1 @@
+/home/admin-vras/aloam_ws/devel/.private/subt_rotors_controller/share/subt_rotors_controller/cmake/subt_rotors_controllerConfig.cmake

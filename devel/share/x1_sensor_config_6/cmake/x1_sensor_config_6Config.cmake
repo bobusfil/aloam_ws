@@ -1,0 +1,1 @@
+/home/admin-vras/aloam_ws/devel/.private/x1_sensor_config_6/share/x1_sensor_config_6/cmake/x1_sensor_config_6Config.cmake

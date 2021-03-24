@@ -1,0 +1,8 @@
+prefix=/home/admin-vras/aloam_ws/devel/.private/subt_rotors_controller
+
+Name: subt_rotors_controller
+Description: Description of subt_rotors_controller
+Version: 1.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: rotors_control

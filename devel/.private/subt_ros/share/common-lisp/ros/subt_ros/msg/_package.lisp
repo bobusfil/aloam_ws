@@ -1,0 +1,25 @@
+(cl:defpackage subt_ros-msg
+  (:use )
+  (:export
+   "<ARTIFACTREPORT>"
+   "ARTIFACTREPORT"
+   "<COMPETITIONCLOCK>"
+   "COMPETITIONCLOCK"
+   "<KINEMATICSTATES>"
+   "KINEMATICSTATES"
+   "<MARSUPIAL>"
+   "MARSUPIAL"
+   "<REGIONEVENT>"
+   "REGIONEVENT"
+   "<ROBOT>"
+   "ROBOT"
+   "<ROBOTEVENT>"
+   "ROBOTEVENT"
+   "<ROBOTMETRIC>"
+   "ROBOTMETRIC"
+   "<RUNSTATISTICS>"
+   "RUNSTATISTICS"
+   "<RUNSTATUS>"
+   "RUNSTATUS"
+  ))
+

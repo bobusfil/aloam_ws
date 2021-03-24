@@ -1,0 +1,1 @@
+/home/admin-vras/aloam_ws/devel/.private/subt_msgs/share/subt_msgs/cmake/subt_msgsConfig-version.cmake

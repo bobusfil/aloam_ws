@@ -1,0 +1,8 @@
+prefix=/home/admin-vras/aloam_ws/install
+
+Name: x3_sensor_config_5
+Description: Description of x3_sensor_config_5
+Version: 0.1.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

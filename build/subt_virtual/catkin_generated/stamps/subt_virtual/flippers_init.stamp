@@ -1,0 +1,50 @@
+#!/usr/bin/env python
+
+"""
+This node which makes sure that flippers start in the observation mode. Just publishing the posture command once is not
+sufficient as some messages get lost...
+"""
+from threading import Lock
+
+import rospy
+from stamped_msgs.msg import Int32 as Int32Stamped
+
+from nifti_teleop_client.msg import Priority
+from nifti_teleop_client.client import TeleopClient
+from nifti_teleop_client.priority import PRIORITIES_BY_VALUE
+
+from librover_common_py import *
+
+
+posture = -1
+
+
+def posture_cb(posture_msg):
+    assert isinstance(posture_msg, Int32Stamped)
+    global posture
+    posture = posture_msg.data
+
+
+if __name__ == '__main__':
+    rospy.init_node('flippers_init')
+
+    cmd_pub = TeleopClient(PRIORITIES_BY_VALUE[Priority.PRIORITY_NAV], None, 'posture_cmd_stamped', None, queue_size=1)
+    posture_sub = rospy.Subscriber("posture_stamped", Int32Stamped, posture_cb, queue_size=10)
+
+    target_posture_idx = indexFromPosture(FlipperPosture_OBSERVATION)
+
+    rate = rospy.Rate(0.2)
+    msg = Int32Stamped()
+    msg.data = target_posture_idx
+
+    while posture != target_posture_idx and not rospy.is_shutdown():
+        rospy.loginfo("Target flipper posture not yet reached...")
+        try:
+            msg.header.stamp = rospy.Time.now()
+            cmd_pub.publish(msg)
+            rate.sleep()
+        except rospy.ROSInterruptException:
+            break
+
+    if posture == target_posture_idx:
+        rospy.loginfo("Target flipper posture reached, exiting")

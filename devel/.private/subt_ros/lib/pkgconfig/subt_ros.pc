@@ -1,0 +1,8 @@
+prefix=/home/admin-vras/aloam_ws/devel/.private/subt_ros
+
+Name: subt_ros
+Description: Description of subt_ros
+Version: 0.1.0
+Cflags: -I/home/admin-vras/aloam_ws/devel/.private/subt_ros/include
+Libs: -L${prefix}/lib 
+Requires: message_runtime subt_communication_broker std_msgs topic_tools

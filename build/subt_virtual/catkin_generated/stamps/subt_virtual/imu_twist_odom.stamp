@@ -1,0 +1,111 @@
+#!/usr/bin/env python
+"""
+Fuse IMU orientation with linear velocity to odometry tf.
+"""
+import rospy
+from sensor_msgs.msg import Imu
+from geometry_msgs.msg import TransformStamped, Twist
+import numpy as np
+from tf2_ros import TransformBroadcaster
+from threading import RLock
+from transforms3d.quaternions import rotate_vector
+
+
+def slots(msg):
+    return [getattr(msg, var) for var in msg.__slots__]
+
+
+def array(msg):
+    return np.array(slots(msg))
+
+
+def wxyz(xyzw):
+    shape = xyzw.shape
+    xyzw = xyzw.ravel()
+    return np.array([xyzw[3], xyzw[0], xyzw[1], xyzw[2]]).reshape(shape)
+
+
+class ImuTwistOdom(object):
+
+    def __init__(self):
+        self.odom_frame = rospy.get_param('~odom_frame', 'odom')
+        self.robot_frame = rospy.get_param('~robot_frame', 'base_link')
+        self.scale_vel = np.array(rospy.get_param('~scale_vel', [1., 1., .01]))
+        self.smooth_vel = rospy.get_param('~smooth_vel', 0.5)
+        self.max_vel_age = rospy.get_param('~max_vel_age', 0.5)
+
+        # State variables
+        self.lock = RLock()
+        # Position in odom frame
+        self.x = np.zeros((3,))
+        # Orientation in odom frame (wxyz)
+        self.q = None
+        self.q_time = None
+        # Velocity in robot frame
+        self.v = np.zeros((3,))
+        self.v_zero = np.zeros((3,))
+        # Velocity timestamp
+        self.v_time = rospy.Time.now()
+
+        self.tf_msg = TransformStamped()
+        self.tf_msg.header.frame_id = self.odom_frame
+        self.tf_msg.child_frame_id = self.robot_frame
+        self.tf_pub = TransformBroadcaster()
+
+        self.imu_sub = rospy.Subscriber("imu", Imu, self.imu_cb, queue_size=10)
+        self.twist_sub = rospy.Subscriber("twist", Twist, self.twist_cb, queue_size=10)
+
+    def twist_cb(self, twist_msg):
+        assert isinstance(twist_msg, Twist)
+        with self.lock:
+            self.v_time = rospy.Time.now()
+            v = self.scale_vel * array(twist_msg.linear)
+            if self.v is None or self.smooth_vel == 0.:
+                self.v = v
+            else:
+                self.v = self.smooth_vel * self.v + (1. - self.smooth_vel) * v
+            # rospy.loginfo('Smoothed velocity: %.3f, %.3f %.3f', *self.v)
+
+    def imu_cb(self, imu_msg):
+        assert isinstance(imu_msg, Imu)
+        with self.lock:
+            q = imu_msg.orientation
+            self.q = wxyz(array(q))
+            t = imu_msg.header.stamp
+
+            if self.q_time is None or self.v is None:
+                self.q_time = t
+                return
+            elif self.q_time >= t:
+                rospy.logwarn('IMU time not increasing.')
+                return
+
+            v_age = (rospy.Time.now() - self.v_time).to_sec()
+            if v_age > self.max_vel_age:
+                # rospy.logwarn('Twist age %.2f s > max %.2f s.',
+                #               v_age, self.max_vel_age)
+                v = self.v_zero
+            else:
+                v = self.v
+
+            dt = (t - self.q_time).to_sec()
+            self.q_time = t
+            dv = v * dt
+            dv = rotate_vector(dv, self.q)
+            # rospy.loginfo('Delta t: %.3f s, delta v: %.3f, %.3f, %.3f m', dt, *dv)
+            self.x += dv
+
+            self.tf_msg.header.stamp = t
+            t = self.tf_msg.transform.translation
+            t.x, t.y, t.z = self.x
+            self.tf_msg.transform.rotation = q
+            self.tf_pub.sendTransform(self.tf_msg)
+
+
+if __name__ == '__main__':
+    rospy.init_node("imu_twist_odom")
+    node = ImuTwistOdom()
+    try:
+        rospy.spin()
+    except rospy.ROSInterruptException:
+        pass

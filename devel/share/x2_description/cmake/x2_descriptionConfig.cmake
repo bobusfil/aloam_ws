@@ -1,0 +1,1 @@
+/home/admin-vras/aloam_ws/devel/.private/x2_description/share/x2_description/cmake/x2_descriptionConfig.cmake

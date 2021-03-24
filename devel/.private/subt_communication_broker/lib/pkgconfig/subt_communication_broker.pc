@@ -1,0 +1,8 @@
+prefix=/home/admin-vras/aloam_ws/devel/.private/subt_communication_broker
+
+Name: subt_communication_broker
+Description: Description of subt_communication_broker
+Version: 0.1.0
+Cflags: -I/home/admin-vras/aloam_ws/src/subt/subt-communication/subt_communication_broker/include
+Libs: -L${prefix}/lib -lsubt_communication_broker -lsubt_communication_client -lSubtCommsProtobuf
+Requires: roscpp subt_communication_model subt_rf_interface subt_msgs

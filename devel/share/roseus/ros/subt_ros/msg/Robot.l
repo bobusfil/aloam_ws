@@ -1,0 +1,1 @@
+/home/admin-vras/aloam_ws/devel/.private/subt_ros/share/roseus/ros/subt_ros/msg/Robot.l

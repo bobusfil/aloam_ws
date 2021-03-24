@@ -1,0 +1,1 @@
+/home/admin-vras/aloam_ws/devel/.private/robotika_x2_sensor_config_1/lib/pkgconfig/robotika_x2_sensor_config_1.pc

@@ -1,0 +1,58 @@
+
+€
+ignition/msgs/time.protoignition.msgs",
+Time
+sec (Rsec
+nsec (RnsecB
+com.ignition.msgsB
+TimeProtosbproto3
+„
+ignition/msgs/header.protoignition.msgsignition/msgs/time.proto"‘
+Header)
+stamp (2.ignition.msgs.TimeRstamp-
+data (2.ignition.msgs.Header.MapRdata-
+Map
+key (	Rkey
+value (	RvalueB!
+com.ignition.msgsBHeaderProtosbproto3
+Û
+ignition/msgs/vector3d.protoignition.msgsignition/msgs/header.proto"c
+Vector3d-
+header (2.ignition.msgs.HeaderRheader
+x (Rx
+y (Ry
+z (RzB#
+com.ignition.msgsBVector3dProtosbproto3
+ï
+ignition/msgs/quaternion.protoignition.msgsignition/msgs/header.proto"s
+
+Quaternion-
+header (2.ignition.msgs.HeaderRheader
+x (Rx
+y (Ry
+z (Rz
+w (RwB%
+com.ignition.msgsBQuaternionProtosbproto3
+ú
+ignition/msgs/pose.protoignition.msgsignition/msgs/vector3d.protoignition/msgs/quaternion.protoignition/msgs/header.proto"Ë
+Pose-
+header (2.ignition.msgs.HeaderRheader
+name (	Rname
+id (Rid3
+position (2.ignition.msgs.Vector3dRposition;
+orientation (2.ignition.msgs.QuaternionRorientationB
+com.ignition.msgsB
+PoseProtosbproto3
+Î
+artifact.proto	subt.msgsignition/msgs/pose.protoignition/msgs/time.proto"G
+Artifact
+type (Rtype'
+pose (2.ignition.msgs.PoseRpose"«
+ArtifactScore
+	report_id (RreportId/
+artifact (2.subt.msgs.ArtifactRartifactB
+submitted_datetime (2.ignition.msgs.TimeRsubmittedDatetime.
+sim_time (2.ignition.msgs.TimeRsimTime
+run (Rrun#
+report_status (	RreportStatus!
+score_change (RscoreChangebproto3

@@ -1,0 +1,9 @@
+[35m[1mScanning dependencies of target pathLength[0m
+[  8%] [32mBuilding CXX object CMakeFiles/pathLength.dir/src/pathLength.cpp.o[0m
+[ 25%] Built target kittiHelper
+[ 41%] Built target ascanRegistration
+[ 58%] Built target diffTransNode
+[ 75%] Built target alaserOdometry
+[ 91%] Built target alaserMapping
+[100%] [32m[1mLinking CXX executable /home/admin-vras/aloam_ws/devel/.private/aloam_velodyne/lib/aloam_velodyne/pathLength[0m
+[100%] Built target pathLength

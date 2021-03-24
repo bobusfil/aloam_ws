@@ -1,0 +1,39 @@
+#!/usr/bin/env python
+
+import rospy
+from subt_msgs.srv import DatagramRos, DatagramRosRequest, DatagramRosResponse
+
+"""
+Multiplex subt comms client Bind() calls to multiple nodes.
+
+The problem is that comms client's Bind() normally advertises services /address for each bound address.
+These service names are global, which means only one node can call Bind() with the given address at a time.
+
+This node creates the global service itself and "relays" the service calls to (possibly multiple) "clients" via a topic.
+The clients should use SharedCommsClient instead of the normal CommsClient. There can be no instance of original
+CommsClient used at all because it would compete with the global services we need to advertise.
+
+See https://github.com/osrf/subt/issues/638 .
+"""
+
+
+def msg_cb(req):
+    assert isinstance(req, DatagramRosRequest)
+    rospy.logdebug("Demuxing message %s -> %s:%i, len %i, rssi %f" % (req.src_address, req.dst_address, req.dst_port, len(req.data), req.rssi))
+    pub.publish(req)
+    return DatagramRosResponse()
+
+
+if __name__ == '__main__':
+    rospy.init_node("comms_client_bind_demux")
+
+    address = rospy.get_param("~bind_address")
+
+    pub = rospy.Publisher("comms/" + address, DatagramRosRequest, queue_size=100, tcp_nodelay=True)
+    service = rospy.Service("/" + address, DatagramRos, msg_cb)
+    rospy.loginfo("Advertised demuxed comms service /" + address, logger_name="bind_demux")
+
+    try:
+        rospy.spin()
+    except rospy.ROSInterruptException:
+        pass

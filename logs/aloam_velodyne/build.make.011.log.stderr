@@ -1,0 +1,21 @@
+[01m[K/home/admin-vras/aloam_ws/src/A-LOAM/src/pathLength.cpp:10:28:[m[K [01;31m[Kerror: [m[K‘[01m[Ktf2_msgs[m[K’ does not name a type; did you mean ‘[01m[Kstd_msgs[m[K’?
+ void lengthIncrement(const [01;31m[Ktf2_msgs[m[K::TFMessage& msg)
+                            [01;31m[K^~~~~~~~[m[K
+                            [32m[Kstd_msgs[m[K
+[01m[K/home/admin-vras/aloam_ws/src/A-LOAM/src/pathLength.cpp:10:47:[m[K [01;31m[Kerror: [m[Kexpected unqualified-id before ‘[01m[K&[m[K’ token
+ void lengthIncrement(const tf2_msgs::TFMessage[01;31m[K&[m[K msg)
+                                               [01;31m[K^[m[K
+[01m[K/home/admin-vras/aloam_ws/src/A-LOAM/src/pathLength.cpp:10:47:[m[K [01;31m[Kerror: [m[Kexpected ‘[01m[K)[m[K’ before ‘[01m[K&[m[K’ token
+ void lengthIncrement[34m[K([m[Kconst tf2_msgs::TFMessage[01;31m[K&[m[K msg)
+                     [34m[K~[m[K                         [01;31m[K^[m[K
+                                               [32m[K)[m[K
+[01m[K/home/admin-vras/aloam_ws/src/A-LOAM/src/pathLength.cpp:10:49:[m[K [01;31m[Kerror: [m[Kexpected initializer before ‘[01m[Kmsg[m[K’
+ void lengthIncrement(const tf2_msgs::TFMessage& [01;31m[Kmsg[m[K)
+                                                 [01;31m[K^~~[m[K
+[01m[K/home/admin-vras/aloam_ws/src/A-LOAM/src/pathLength.cpp:[m[K In function ‘[01m[Kint main(int, char**)[m[K’:
+[01m[K/home/admin-vras/aloam_ws/src/A-LOAM/src/pathLength.cpp:65:51:[m[K [01;31m[Kerror: [m[K‘[01m[KlengthIncrement[m[K’ was not declared in this scope
+     ros::Subscriber sub = n.subscribe("tf", 1000, [01;31m[KlengthIncrement[m[K);
+                                                   [01;31m[K^~~~~~~~~~~~~~~[m[K
+make[2]: *** [CMakeFiles/pathLength.dir/src/pathLength.cpp.o] Error 1
+make[1]: *** [CMakeFiles/pathLength.dir/all] Error 2
+make: *** [all] Error 2

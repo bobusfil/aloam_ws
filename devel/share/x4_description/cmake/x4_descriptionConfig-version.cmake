@@ -1,0 +1,1 @@
+/home/admin-vras/aloam_ws/devel/.private/x4_description/share/x4_description/cmake/x4_descriptionConfig-version.cmake

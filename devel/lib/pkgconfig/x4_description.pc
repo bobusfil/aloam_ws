@@ -1,0 +1,1 @@
+/home/admin-vras/aloam_ws/devel/.private/x4_description/lib/pkgconfig/x4_description.pc

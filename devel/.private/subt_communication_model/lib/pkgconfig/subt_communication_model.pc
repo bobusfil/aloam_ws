@@ -1,0 +1,8 @@
+prefix=/home/admin-vras/aloam_ws/devel/.private/subt_communication_model
+
+Name: subt_communication_model
+Description: Description of subt_communication_model
+Version: 0.1.0
+Cflags: -I/home/admin-vras/aloam_ws/src/subt/subt-communication/subt_communication_model/include
+Libs: -L${prefix}/lib -lsubt_communication_model
+Requires: subt_rf_interface

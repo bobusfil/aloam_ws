@@ -1,0 +1,31 @@
+#!/usr/bin/env python
+
+import rospy
+from std_msgs.msg import Bool, Float32
+
+"""
+This is a shim for republishing CO2 values
+"""
+
+
+def gas_detected_cb(gas_msg):
+    assert isinstance(gas_msg, Bool)
+    if gas_msg.data:
+        pub.publish(Float32(detected))
+    else:
+        pub.publish(Float32(ambient))
+
+
+if __name__ == '__main__':
+    rospy.init_node("co2_pub")
+
+    pub = rospy.Publisher("co2", Float32, queue_size=1)
+    ambient = rospy.get_param("~ambient", 500.0)
+    detected = rospy.get_param("~detected", 1500.0)
+
+    gas_detected_sub = rospy.Subscriber("gas_detected", Bool, gas_detected_cb, queue_size=1)
+
+    try:
+        rospy.spin()
+    except rospy.ROSInterruptException:
+        pass

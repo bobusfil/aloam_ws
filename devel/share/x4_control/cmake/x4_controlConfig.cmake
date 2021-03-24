@@ -1,0 +1,1 @@
+/home/admin-vras/aloam_ws/devel/.private/x4_control/share/x4_control/cmake/x4_controlConfig.cmake

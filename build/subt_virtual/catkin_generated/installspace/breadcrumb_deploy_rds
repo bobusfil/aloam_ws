@@ -1,0 +1,64 @@
+#!/usr/bin/env python2
+
+import rospy
+from std_msgs.msg import Empty, UInt8
+from rds_msgs.msg import Befehl
+
+"""
+Deploy breadcrumbs via RDS commands
+"""
+
+num_breadcrumbs = 12
+deployed_ids = list()
+
+
+def command_cb(msg):
+    assert isinstance(msg, Befehl)
+    if msg.command.data != deploy_befehl:
+        return
+
+    bread_id = msg.val_mm.data
+
+    if bread_id in deployed_ids:
+        rospy.logdebug("Requested to drop already dropped breadcrumb %i" % bread_id, logger_name="breadcrumb_deployer")
+        return
+
+    if len(deployed_ids) >= num_breadcrumbs:
+        rospy.logerr("Out of breadcrumbs", logger_name="breadcrumb_deployer")
+        return
+
+    pub.publish(Empty())
+    deployed_ids.append(bread_id)
+
+    ack = Befehl()
+    ack.command.data = ack_befehl
+    ack.val_mm.data = bread_id
+    ack_pub.publish(ack)
+
+    remaining = num_breadcrumbs - len(deployed_ids)
+    remaining_pub.publish(UInt8(remaining))
+
+    rospy.loginfo("Dropped breadcrumb %i. Remaining %i/%i." % (bread_id, remaining, num_breadcrumbs), logger_name="breadcrumb_deployer")
+
+
+if __name__ == '__main__':
+    rospy.init_node("breadcrumb_deploy_rds")
+
+    num_breadcrumbs = rospy.get_param("~num_breadcrumbs", num_breadcrumbs)
+    deploy_befehl = rospy.get_param("~deploy_befehl", 18)
+    ack_befehl = rospy.get_param("~ack_befehl", 19)
+
+    pub = rospy.Publisher("breadcrumb/deploy", Empty, queue_size=1)
+
+    deploy_sub = rospy.Subscriber("mapnav/untercommand", Befehl, command_cb, queue_size=1)
+    ack_pub = rospy.Publisher("mapnav/ubercommand", Befehl, queue_size=1)
+    remaining_pub = rospy.Publisher("breadcrumbs_remaining", UInt8, queue_size=1, latch=True)
+
+    rospy.loginfo("Started breadcrumb deployer with %i breadcrumbs." % num_breadcrumbs, logger_name="breadcrumb_deployer")
+
+    remaining_pub.publish(UInt8(num_breadcrumbs))
+
+    try:
+        rospy.spin()
+    except rospy.ROSInterruptException:
+        pass

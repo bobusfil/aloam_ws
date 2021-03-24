@@ -1,0 +1,40 @@
+#!/usr/bin/env python2
+"""
+Detach marsupial at a given time.
+"""
+import rospy
+from std_msgs.msg import Empty
+from subt_ros.msg import CompetitionClock
+
+
+def check_detach(msg):
+    assert isinstance(msg, CompetitionClock)
+    if msg.phase != "run":
+        return
+
+    if msg.data.to_sec() < (3600 - timeout):
+        detach()
+
+
+def detach():
+    rospy.logwarn("Detaching " + marsupial)
+    pub.publish(Empty())
+    rospy.signal_shutdown("Detached")
+
+
+if __name__ == '__main__':
+    rospy.init_node("detach_marsupial")
+    timeout = rospy.get_param("~timeout", 100.0)
+    ros_time = rospy.get_param("~ros_time", False)  # if False, timeout is in RUN phase clock, otherwise it is ROS time since start
+    marsupial = rospy.get_param("~marsupial", "uav2")
+
+    sub = rospy.Subscriber("/subt/run_clock", CompetitionClock, check_detach, queue_size=10)
+    pub = rospy.Publisher("/%s/detach" % marsupial, Empty, queue_size=1)
+
+    if ros_time:
+        t = rospy.Timer(rospy.Duration(timeout), detach)
+
+    try:
+        rospy.spin()
+    except rospy.ROSInterruptException:
+        pass

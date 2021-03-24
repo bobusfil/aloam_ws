@@ -1,0 +1,34 @@
+#!/usr/bin/env python
+import rospy
+from nav_msgs.msg import Odometry
+
+"""
+This node allows setting odometry twist covariance.
+Nonzero covariance is needed by robot_pose_ekf.
+"""
+
+
+def odom_cb(odom_msg):
+    assert isinstance(odom_msg, Odometry)
+    pose_cov = list(odom_msg.pose.covariance)
+    pose_cov[::7] = pose_cov_diag
+    odom_msg.pose.covariance = pose_cov
+    twist_cov = list(odom_msg.twist.covariance)
+    twist_cov[::7] = twist_cov_diag
+    odom_msg.twist.covariance = twist_cov
+    odom_pub.publish(odom_msg)
+
+
+if __name__ == '__main__':
+    rospy.init_node("odom_setter")
+
+    pose_cov_diag = rospy.get_param("~pose_cov_diag", [.1, .1, .1, .1, .1, .1])
+    twist_cov_diag = rospy.get_param("~twist_cov_diag", [.1, .1, .1, .1, .1, .1])
+
+    odom_pub = rospy.Publisher("output", Odometry, queue_size=10)
+    odom_sub = rospy.Subscriber("input", Odometry, odom_cb, queue_size=10)
+
+    try:
+        rospy.spin()
+    except rospy.ROSInterruptException:
+        pass

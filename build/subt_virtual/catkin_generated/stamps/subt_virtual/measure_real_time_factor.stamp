@@ -1,0 +1,36 @@
+#!/usr/bin/env python
+
+import rospy
+import time
+
+"""
+Measure real-time factor and print it after the measurement is done
+"""
+
+if __name__ == '__main__':
+    rospy.init_node("measure_real_time_factor")
+
+    duration = rospy.get_param("~wall_duration", 15.0)
+    initial_wait = rospy.get_param("~initial_wait", duration)
+    inverse = rospy.get_param("~inverse", False)
+
+    while not rospy.rostime.is_rostime_initialized() or rospy.Time.now().is_zero():
+        time.sleep(0.1)
+
+    if initial_wait != 0.0:
+        time.sleep(initial_wait)  # some settleup time
+
+    start_ros = rospy.Time.now()
+    start_wall = time.time()
+
+    time.sleep(duration)
+
+    end_ros = rospy.Time.now()
+    end_wall = time.time()
+
+    duration_ros = (end_ros - start_ros).to_sec()
+    duration_wall = (end_wall - start_wall)
+
+    rtf = duration_ros / duration_wall
+
+    print("%1.4f" % (rtf if not inverse else 1.0 / rtf))

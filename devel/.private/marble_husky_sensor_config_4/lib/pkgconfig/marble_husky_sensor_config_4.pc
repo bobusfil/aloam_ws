@@ -1,0 +1,8 @@
+prefix=/home/admin-vras/aloam_ws/devel/.private/marble_husky_sensor_config_4
+
+Name: marble_husky_sensor_config_4
+Description: Description of marble_husky_sensor_config_4
+Version: 0.1.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

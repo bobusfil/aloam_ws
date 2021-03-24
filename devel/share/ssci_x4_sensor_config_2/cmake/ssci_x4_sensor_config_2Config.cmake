@@ -1,0 +1,1 @@
+/home/admin-vras/aloam_ws/devel/.private/ssci_x4_sensor_config_2/share/ssci_x4_sensor_config_2/cmake/ssci_x4_sensor_config_2Config.cmake

@@ -1,0 +1,31 @@
+
+€
+ignition/msgs/time.protoignition.msgs",
+Time
+sec (Rsec
+nsec (RnsecB
+com.ignition.msgsB
+TimeProtosbproto3
+„
+ignition/msgs/header.protoignition.msgsignition/msgs/time.proto"‘
+Header)
+stamp (2.ignition.msgs.TimeRstamp-
+data (2.ignition.msgs.Header.MapRdata-
+Map
+key (	Rkey
+value (	RvalueB!
+com.ignition.msgsBHeaderProtosbproto3
+Í
+ignition/msgs/stringmsg_v.protoignition.msgsignition/msgs/header.proto"P
+StringMsg_V-
+header (2.ignition.msgs.HeaderRheader
+data (	RdataB%
+com.ignition.msgsBStringMsgVProtosbproto3
+ó
+neighbor_m.proto	subt.msgsignition/msgs/stringmsg_v.proto"ª
+
+Neighbor_MB
+	neighbors (2$.subt.msgs.Neighbor_M.NeighborsEntryR	neighborsX
+NeighborsEntry
+key (	Rkey0
+value (2.ignition.msgs.StringMsg_VRvalue:8bproto3

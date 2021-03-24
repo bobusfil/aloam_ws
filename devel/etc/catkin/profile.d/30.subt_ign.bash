@@ -1,0 +1,1 @@
+/home/admin-vras/aloam_ws/devel/.private/subt_ign/etc/catkin/profile.d/30.subt_ign.bash

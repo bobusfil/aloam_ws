@@ -1,0 +1,1 @@
+/home/admin-vras/aloam_ws/devel/.private/x4_sensor_config_6/share/x4_sensor_config_6/cmake/x4_sensor_config_6Config-version.cmake

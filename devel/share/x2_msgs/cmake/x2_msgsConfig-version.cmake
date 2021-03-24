@@ -1,0 +1,1 @@
+/home/admin-vras/aloam_ws/devel/.private/x2_msgs/share/x2_msgs/cmake/x2_msgsConfig-version.cmake

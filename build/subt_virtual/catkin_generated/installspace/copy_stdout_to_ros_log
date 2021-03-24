@@ -1,0 +1,141 @@
+#!/usr/bin/env python2
+import os
+import sys
+import urlparse
+import time
+import psutil
+import threading
+import functools
+
+import rospy
+import rosnode
+import rosgraph
+
+try:
+    from xmlrpc.client import ServerProxy
+except ImportError:
+    from xmlrpclib import ServerProxy
+
+
+def follow(thefile):
+    try:
+        thefile.seek(0, 0 if read_from_start else 2)
+    except IOError:
+        pass
+
+    line = ""
+    while not rospy.is_shutdown():
+        while "\n" not in line and not rospy.is_shutdown():
+            new_data = thefile.readline()  # retains newline
+            if not new_data:  # no data read
+                time.sleep(1)
+                continue
+            line += new_data
+        yield line[:-1]  # do not yield the newline
+        line = ""
+
+
+if __name__ == '__main__':
+    rospy.init_node("copy_stdout_to_ros_log")
+
+    node_name = rospy.resolve_name(rospy.get_param("~node"))
+    ignore_same_lines = rospy.get_param("~ignore_same_lines", True)
+    read_from_start = rospy.get_param("~read_from_start", True)
+
+    ID = '/rosnode'
+    master = rosgraph.Master(ID, master_uri=os.environ["ROS_MASTER_URI"])
+    node_api = None
+
+    while node_api is None:
+        node_api = rosnode.get_api_uri(master, node_name)
+        if not node_api:
+            print("Waiting for node {} to start...".format(node_name))
+            time.sleep(1.0)
+        if rospy.is_shutdown():
+            sys.exit(0)
+
+    node_machine = urlparse.urlparse(node_api).hostname
+    this_node_machine = urlparse.urlparse(rospy.get_node_uri()).hostname
+
+    if node_machine != this_node_machine:
+        rospy.logerr("Node {} runs on machine {}, whilst {} runs on machine {}. Both have to run on the same machine".format(
+            node_name, node_machine, rospy.get_name(), this_node_machine))
+        sys.exit(1)
+
+    node = ServerProxy(node_api)
+    pid = rosnode._succeed(node.getPid(ID))
+
+    try:
+        node_process = psutil.Process(pid)
+    except psutil.NoSuchProcess:
+        rospy.logerr("Process with PID {} of node {} was not found.".format(pid, node_name))
+        sys.exit(1)
+
+    stdout = None
+    stderr = None
+    for open_file in node_process.open_files():
+        if open_file.fd == 1:
+            stdout = open_file.path
+        elif open_file.fd == 2:
+            stderr = open_file.path
+
+    if stdout is None:
+        fd_file = "/proc/{}/fd/1".format(pid)
+        if os.path.lexists(fd_file):
+            print("Node {} writes stdout to a console, cannot copy its output. Run the node with output=\"log\".".format(node_name))
+        else:
+            print("Node {} doesn't write to stdout".format(node_name))
+
+    if stderr is None:
+        fd_file = "/proc/{}/fd/2".format(pid)
+        if os.path.lexists(fd_file):
+            print("Node {} writes stderr to a console, cannot copy its output. Run the node with output=\"log\".".format(node_name))
+        else:
+            print("Node {} doesn't write to stderr".format(node_name))
+
+    if stdout is None and stderr is None:
+        rospy.logwarn("Node {} doesn't write anything to log, exiting".format(node_name))
+        sys.exit(0)
+
+    rospy.loginfo("Reading stdout from {} and stderr from {}".format(stdout, stderr))
+    rospy.loginfo("If it is a python node, be sure to run it with PYTHONUNBUFFERED=1 to get the fastest access to the logs")
+
+    def relay_output(log_file, logfn):
+        while not os.path.exists(log_file):
+            print("Waiting for log file {} to be created...".format(log_file))
+            time.sleep(1)
+            if rospy.is_shutdown():
+                return
+
+        with open(log_file, "r") as log:
+            loglines = follow(log)
+            last_line = ""
+            num_same_lines = 0
+            for line in loglines:
+                if ignore_same_lines and num_same_lines > 1 and line != last_line:
+                    logfn("[... repeated {} times ...]".format(num_same_lines), logger_name=node_name)
+                    num_same_lines = 0
+                if not ignore_same_lines or line != last_line:
+                    logfn(line, logger_name=node_name)
+                if line == last_line:
+                    num_same_lines += 1
+                last_line = line
+                if rospy.is_shutdown():
+                    return
+
+    threads = list()
+
+    if stdout is not None:
+        t = threading.Thread(target=functools.partial(relay_output, stdout, rospy.loginfo))
+        threads.append(t)
+    if stderr is not None:
+        t = threading.Thread(target=functools.partial(relay_output, stderr, rospy.logerr))
+        threads.append(t)
+
+    for t in threads:
+        t.start()
+
+    rospy.spin()
+
+    for t in threads:
+        t.join()
