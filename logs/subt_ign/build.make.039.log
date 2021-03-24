@@ -1,0 +1,34 @@
+[  1%] Built target protobuf_compilation
+[34m[1mUnpacking cave_circuit_practice_02.dat.zip[0m
+[  5%] Built target gtest
+x cave_circuit_practice_02.dat
+[  8%] Built target SubtProtobuf
+[ 24%] Built target SubtCommon
+[ 27%] Built target validate_visibility_table
+[ 31%] Built target path_tracer
+[ 34%] Built target BaseStationPlugin
+[ 37%] Built target ConnectionValidator
+[ 44%] Built target tunnel_generator
+[ 48%] Built target level_generator
+[ 51%] Built target dot_generator
+[ 55%] Built target ArtifactValidator
+[ 62%] Built target GameLogicPlugin
+[ 62%] Built target CommsBrokerPlugin
+[ 65%] Built target GasEmitterDetectorPlugin
+[ 68%] Built target VisibilityPlugin
+[ 72%] Built target ControllerPlugin
+[ 75%] Built target log_checker
+[ 82%] Built target cave_generator
+[ 89%] Built target urban_generator
+[ 93%] Built target max_test_score
+[ 96%] Built target validate_connections
+[100%] Built target test_score
+[34m[1mUnpacking cave_circuit_03.dat.zip[0m
+x cave_circuit_03.dat
+[34m[1mUnpacking cave_circuit_04.dat.zip[0m
+x cave_circuit_04.dat
+[34m[1mUnpacking cave_circuit_07.dat.zip[0m
+x cave_circuit_07.dat
+[34m[1mUnpacking cave_circuit_08.dat.zip[0m
+x cave_circuit_08.dat
+[100%] Built target unzip_dat

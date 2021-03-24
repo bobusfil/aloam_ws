@@ -1,0 +1,23 @@
+[  0%] Built target _subt_msgs_generate_messages_check_deps_Register
+[  0%] Built target std_msgs_generate_messages_nodejs
+[  0%] Built target _subt_msgs_generate_messages_check_deps_SetRate
+[  0%] Built target geometry_msgs_generate_messages_nodejs
+[  0%] Built target _subt_msgs_generate_messages_check_deps_Bind
+[  0%] Built target _subt_msgs_generate_messages_check_deps_PoseFromArtifact
+[  0%] Built target _subt_msgs_generate_messages_check_deps_Unregister
+[  0%] Built target _subt_msgs_generate_messages_check_deps_DatagramRos
+[  0%] Built target _subt_msgs_generate_messages_check_deps_SetPose
+[  0%] Built target geometry_msgs_generate_messages_eus
+[  0%] Built target std_msgs_generate_messages_eus
+[  0%] Built target std_msgs_generate_messages_py
+[  0%] Built target geometry_msgs_generate_messages_py
+[  0%] Built target std_msgs_generate_messages_cpp
+[  0%] Built target geometry_msgs_generate_messages_cpp
+[  0%] Built target std_msgs_generate_messages_lisp
+[  0%] Built target geometry_msgs_generate_messages_lisp
+[ 18%] Built target subt_msgs_generate_messages_nodejs
+[ 40%] Built target subt_msgs_generate_messages_eus
+[ 62%] Built target subt_msgs_generate_messages_py
+[ 81%] Built target subt_msgs_generate_messages_cpp
+[100%] Built target subt_msgs_generate_messages_lisp
+[100%] Built target subt_msgs_generate_messages

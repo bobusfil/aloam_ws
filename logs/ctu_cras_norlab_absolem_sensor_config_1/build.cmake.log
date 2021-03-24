@@ -1,0 +1,206 @@
+Not searching for unused variables given on the command line.
+[36m--[0m The C compiler identification is GNU 8.4.0
+[36m--[0m The CXX compiler identification is GNU 8.4.0
+[36m--[0m Check for working C compiler: /usr/bin/cc
+[36m--[0m Check for working C compiler: /usr/bin/cc -- works
+[36m--[0m Detecting C compiler ABI info
+[36m--[0m Detecting C compiler ABI info - done
+[36m--[0m Detecting C compile features
+[36m--[0m Detecting C compile features - done
+[36m--[0m Check for working CXX compiler: /usr/bin/c++
+[36m--[0m Check for working CXX compiler: /usr/bin/c++ -- works
+[36m--[0m Detecting CXX compiler ABI info
+[36m--[0m Detecting CXX compiler ABI info - done
+[36m--[0m Detecting CXX compile features
+[36m--[0m Detecting CXX compile features - done
+[36m--[0m Looking for ignition-gazebo4 -- found version 4.5.0
+[36m--[0m Searching for dependencies of ignition-gazebo4
+[36m--[0m Looking for ignition-math6 -- found version 6.7.0
+[36m--[0m Searching for dependencies of ignition-math6
+[36m--[0m Looking for ignition-plugin1 -- found version 1.1.0
+[36m--[0m Searching for dependencies of ignition-plugin1
+[36m--[0m Searching for <ignition-plugin1> component [loader]
+[36m--[0m Looking for ignition-plugin1-loader -- found version 1.1.0
+[36m--[0m Searching for dependencies of ignition-plugin1-loader
+[36m--[0m Searching for <ignition-plugin1> component [register]
+[36m--[0m Looking for ignition-plugin1-register -- found version 1.1.0
+[36m--[0m Searching for dependencies of ignition-plugin1-register
+[36m--[0m Looking for ignition-transport9 -- found version 9.1.0
+[36m--[0m Searching for dependencies of ignition-transport9
+[36m--[0m Looking for pthread.h
+[36m--[0m Looking for pthread.h - found
+[36m--[0m Looking for pthread_create
+[36m--[0m Looking for pthread_create - not found
+[36m--[0m Looking for pthread_create in pthreads
+[36m--[0m Looking for pthread_create in pthreads - not found
+[36m--[0m Looking for pthread_create in pthread
+[36m--[0m Looking for pthread_create in pthread - found
+[36m--[0m Found Threads: TRUE
+[36m--[0m Found Protobuf: /usr/lib/x86_64-linux-gnu/libprotobuf.so;-lpthread (found suitable version "3.0.0", minimum required is "3")
+[36m--[0m Config-file not installed for ZeroMQ -- checking for pkg-config
+[36m--[0m Checking for module 'libzmq >= 4'
+[36m--[0m   Found libzmq , version 4.3.5
+[36m--[0m Found ZeroMQ: TRUE (Required is at least version "4")
+[36m--[0m Checking for module 'uuid'
+[36m--[0m   Found uuid, version 2.31.1
+[36m--[0m Found UUID: TRUE
+[36m--[0m Looking for ignition-msgs6 -- found version 6.3.0
+[36m--[0m Searching for dependencies of ignition-msgs6
+[36m--[0m Found Protobuf: /usr/lib/x86_64-linux-gnu/libprotobuf.so;-lpthread;-lpthread (found suitable version "3.0.0", minimum required is "3")
+[36m--[0m Looking for ignition-math6 -- found version 6.7.0
+[36m--[0m Checking for module 'tinyxml2'
+[36m--[0m   Found tinyxml2, version 6.0.0
+[36m--[0m Searching for <ignition-transport9> component [log]
+[36m--[0m Looking for ignition-transport9-log -- found version 9.1.0
+[36m--[0m Searching for dependencies of ignition-transport9-log
+[36m--[0m Looking for ignition-msgs6 -- found version 6.3.0
+[36m--[0m Looking for ignition-common3 -- found version 3.10.1
+[36m--[0m Searching for dependencies of ignition-common3
+[36m--[0m Looking for dlfcn.h - found
+[36m--[0m Looking for libdl - found
+[36m--[0m Found DL: TRUE
+[36m--[0m Searching for <ignition-common3> component [profiler]
+[36m--[0m Looking for ignition-common3-profiler -- found version 3.10.1
+[36m--[0m Searching for dependencies of ignition-common3-profiler
+[36m--[0m Searching for <ignition-common3> component [events]
+[36m--[0m Looking for ignition-common3-events -- found version 3.10.1
+[36m--[0m Searching for dependencies of ignition-common3-events
+[36m--[0m Looking for ignition-math6 -- found version 6.7.0
+[36m--[0m Searching for <ignition-common3> component [av]
+[36m--[0m Looking for ignition-common3-av -- found version 3.10.1
+[36m--[0m Searching for dependencies of ignition-common3-av
+[36m--[0m Checking for module 'libswscale'
+[36m--[0m   Found libswscale, version 4.8.100
+[36m--[0m Found SWSCALE: TRUE
+[36m--[0m Checking for module 'libavdevice >= 56.4.100'
+[36m--[0m   Found libavdevice , version 57.10.100
+[36m--[0m Found AVDEVICE: TRUE (Required is at least version "56.4.100")
+[36m--[0m Checking for module 'libavformat'
+[36m--[0m   Found libavformat, version 57.83.100
+[36m--[0m Found AVFORMAT: TRUE
+[36m--[0m Checking for module 'libavcodec'
+[36m--[0m   Found libavcodec, version 57.107.100
+[36m--[0m Found AVCODEC: TRUE
+[36m--[0m Checking for module 'libavutil'
+[36m--[0m   Found libavutil, version 55.78.100
+[36m--[0m Found AVUTIL: TRUE
+[36m--[0m Looking for ignition-fuel_tools5 -- found version 5.1.1
+[36m--[0m Searching for dependencies of ignition-fuel_tools5
+[36m--[0m Found CURL: /usr/lib/x86_64-linux-gnu/libcurl.so (found version "7.58.0")
+[36m--[0m Checking for module 'jsoncpp'
+[36m--[0m   Found jsoncpp, version 1.7.4
+[36m--[0m Found JSONCPP: TRUE
+[36m--[0m Checking for module 'yaml-0.1'
+[36m--[0m   Found yaml-0.1, version 0.1.7
+[36m--[0m Found YAML: TRUE
+[36m--[0m Checking for module 'libzip'
+[36m--[0m   Found libzip, version 1.1.2
+[36m--[0m Found ZIP: TRUE
+[36m--[0m Looking for ignition-common3 -- found version 3.10.1
+[36m--[0m Looking for ignition-msgs6 -- found version 6.3.0
+[36m--[0m Looking for ignition-gui4 -- found version 4.2.0
+[36m--[0m Searching for dependencies of ignition-gui4
+[36m--[0m Found Protobuf: /usr/lib/x86_64-linux-gnu/libprotobuf.so;-lpthread;-lpthread;-lpthread (found suitable version "3.0.0", minimum required is "3")
+[36m--[0m Looking for ignition-math6 -- found version 6.7.0
+[36m--[0m Looking for ignition-common3 -- found version 3.10.1
+[36m--[0m Looking for ignition-plugin1 -- found version 1.1.0
+[36m--[0m Looking for ignition-transport9 -- found version 9.1.0
+[36m--[0m Looking for ignition-rendering4 -- found version 4.5.0
+[36m--[0m Searching for dependencies of ignition-rendering4
+[36m--[0m Looking for ignition-math6 -- found version 6.7.0
+[36m--[0m Looking for ignition-common3 -- found version 3.10.1
+[36m--[0m Searching for dependencies of ignition-common3
+[36m--[0m Looking for dlfcn.h - found
+[36m--[0m Looking for libdl - found
+[36m--[0m Searching for <ignition-common3> component [graphics]
+[36m--[0m Looking for ignition-common3-graphics -- found version 3.10.1
+[36m--[0m Searching for dependencies of ignition-common3-graphics
+[36m--[0m Looking for ignition-math6 -- found version 6.7.0
+[36m--[0m Searching for <ignition-common3> component [events]
+[36m--[0m Looking for ignition-plugin1 -- found version 1.1.0
+[36m--[0m Searching for dependencies of ignition-plugin1
+[36m--[0m Searching for <ignition-plugin1> component [all]
+[36m--[0m Looking for all libraries of ignition-plugin1 -- found version 1.1.0
+[36m--[0m Searching for <ignition-rendering4> component [ogre]
+[36m--[0m Looking for ignition-rendering4-ogre -- found version 4.5.0
+[36m--[0m Searching for dependencies of ignition-rendering4-ogre
+[36m--[0m Found OpenGL: /usr/lib/x86_64-linux-gnu/libOpenGL.so
+[36m--[0m Looking for ignition-msgs6 -- found version 6.3.0
+[36m--[0m Looking for ignition-physics3 -- found version 3.1.0
+[36m--[0m Searching for dependencies of ignition-physics3
+[36m--[0m Looking for ignition-math6 -- found version 6.7.0
+[36m--[0m Searching for dependencies of ignition-math6
+[36m--[0m Searching for <ignition-math6> component [eigen3]
+[36m--[0m Looking for ignition-math6-eigen3 -- found version 6.7.0
+[36m--[0m Searching for dependencies of ignition-math6-eigen3
+[36m--[0m Looking for ignition-plugin1 -- found version 1.1.0
+[36m--[0m Searching for <ignition-physics3> component [mesh]
+[36m--[0m Looking for ignition-physics3-mesh -- found version 3.1.0
+[36m--[0m Searching for dependencies of ignition-physics3-mesh
+[36m--[0m Looking for ignition-common3 -- found version 3.10.1
+[36m--[0m Searching for <ignition-physics3> component [sdf]
+[36m--[0m Looking for ignition-physics3-sdf -- found version 3.1.0
+[36m--[0m Searching for dependencies of ignition-physics3-sdf
+[36m--[0m Looking for ignition-sensors4 -- found version 4.1.0
+[36m--[0m Searching for dependencies of ignition-sensors4
+[36m--[0m Found Protobuf: /usr/lib/x86_64-linux-gnu/libprotobuf.so;-lpthread;-lpthread;-lpthread;-lpthread (found suitable version "3.0.0", minimum required is "3")
+[36m--[0m Looking for ignition-math6 -- found version 6.7.0
+[36m--[0m Looking for ignition-common3 -- found version 3.10.1
+[36m--[0m Looking for ignition-transport9 -- found version 9.1.0
+[36m--[0m Looking for ignition-rendering4 -- found version 4.5.0
+[36m--[0m Looking for ignition-msgs6 -- found version 6.3.0
+[36m--[0m Looking for ignition-plugin1 -- found version 1.1.0
+[36m--[0m Searching for <ignition-sensors4> component [rendering]
+[36m--[0m Looking for ignition-sensors4-rendering -- found version 4.1.0
+[36m--[0m Searching for dependencies of ignition-sensors4-rendering
+[36m--[0m Searching for <ignition-sensors4> component [air_pressure]
+[36m--[0m Looking for ignition-sensors4-air_pressure -- found version 4.1.0
+[36m--[0m Searching for dependencies of ignition-sensors4-air_pressure
+[36m--[0m Searching for <ignition-sensors4> component [altimeter]
+[36m--[0m Looking for ignition-sensors4-altimeter -- found version 4.1.0
+[36m--[0m Searching for dependencies of ignition-sensors4-altimeter
+[36m--[0m Searching for <ignition-sensors4> component [camera]
+[36m--[0m Looking for ignition-sensors4-camera -- found version 4.1.0
+[36m--[0m Searching for dependencies of ignition-sensors4-camera
+[36m--[0m Searching for <ignition-sensors4> component [gpu_lidar]
+[36m--[0m Looking for ignition-sensors4-gpu_lidar -- found version 4.1.0
+[36m--[0m Searching for dependencies of ignition-sensors4-gpu_lidar
+[36m--[0m Searching for <ignition-sensors4> component [imu]
+[36m--[0m Looking for ignition-sensors4-imu -- found version 4.1.0
+[36m--[0m Searching for dependencies of ignition-sensors4-imu
+[36m--[0m Searching for <ignition-sensors4> component [logical_camera]
+[36m--[0m Looking for ignition-sensors4-logical_camera -- found version 4.1.0
+[36m--[0m Searching for dependencies of ignition-sensors4-logical_camera
+[36m--[0m Searching for <ignition-sensors4> component [magnetometer]
+[36m--[0m Looking for ignition-sensors4-magnetometer -- found version 4.1.0
+[36m--[0m Searching for dependencies of ignition-sensors4-magnetometer
+[36m--[0m Searching for <ignition-sensors4> component [depth_camera]
+[36m--[0m Looking for ignition-sensors4-depth_camera -- found version 4.1.0
+[36m--[0m Searching for dependencies of ignition-sensors4-depth_camera
+[36m--[0m Searching for <ignition-sensors4> component [thermal_camera]
+[36m--[0m Looking for ignition-sensors4-thermal_camera -- found version 4.1.0
+[36m--[0m Searching for dependencies of ignition-sensors4-thermal_camera
+[36m--[0m Looking for ignition-rendering4 -- found version 4.5.0
+[36m--[0m Looking for ignition-math6 -- found version 6.7.0
+[36m--[0m Found Protobuf: /usr/lib/x86_64-linux-gnu/libprotobuf.so;-lpthread;-lpthread;-lpthread;-lpthread;-lpthread (found suitable version "3.0.0", minimum required is "3")
+[36m--[0m Looking for ignition-common3 -- found version 3.10.1
+[36m--[0m Using CATKIN_DEVEL_PREFIX: /home/admin-vras/aloam_ws/devel/.private/ctu_cras_norlab_absolem_sensor_config_1
+[36m--[0m Using CMAKE_PREFIX_PATH: /home/admin-vras/aloam_ws/devel;/home/admin-vras/workspace/cras_subt/devel;/opt/ros/melodic
+[36m--[0m This workspace overlays: /home/admin-vras/aloam_ws/devel;/home/admin-vras/workspace/cras_subt/devel;/opt/ros/melodic
+[36m--[0m Found PythonInterp: /usr/bin/python2 (found suitable version "2.7.17", minimum required is "2")
+[36m--[0m Using PYTHON_EXECUTABLE: /usr/bin/python2
+[36m--[0m Using Debian Python package layout
+[36m--[0m Using empy: /usr/bin/empy
+[36m--[0m Using CATKIN_ENABLE_TESTING: ON
+[36m--[0m Call enable_testing()
+[36m--[0m Using CATKIN_TEST_RESULTS_DIR: /home/admin-vras/aloam_ws/build/ctu_cras_norlab_absolem_sensor_config_1/test_results
+[36m--[0m Forcing gtest/gmock from source, though one was otherwise available.
+[36m--[0m Found gtest sources under '/usr/src/googletest': gtests will be built
+[36m--[0m Found gmock sources under '/usr/src/googletest': gmock will be built
+[36m--[0m Found PythonInterp: /usr/bin/python2 (found version "2.7.17")
+[36m--[0m Using Python nosetests: /usr/bin/nosetests-2.7
+[36m--[0m catkin 0.7.29
+[36m--[0m BUILD_SHARED_LIBS is on
+[36m--[0m Configuring done
+[36m--[0m Generating done
+[36m--[0m Build files have been written to: /home/admin-vras/aloam_ws/build/ctu_cras_norlab_absolem_sensor_config_1
