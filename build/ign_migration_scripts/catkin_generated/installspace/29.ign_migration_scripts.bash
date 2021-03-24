@@ -1,0 +1,4 @@
+# Export Ignition environment variables
+
+export IGN_LAUNCH_CONFIG_PATH=/home/admin-vras/aloam_ws/install/share/ign_migration_scripts/launch
+export IGN_GAZEBO_RESOURCE_PATH=/home/admin-vras/aloam_ws/install/share/ign_migration_scripts/worlds:${IGN_GAZEBO_RESOURCE_PATH}

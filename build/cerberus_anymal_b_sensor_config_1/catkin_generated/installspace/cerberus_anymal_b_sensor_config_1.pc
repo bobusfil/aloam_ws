@@ -1,0 +1,8 @@
+prefix=/home/admin-vras/aloam_ws/install
+
+Name: cerberus_anymal_b_sensor_config_1
+Description: Description of cerberus_anymal_b_sensor_config_1
+Version: 1.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

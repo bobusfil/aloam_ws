@@ -1,0 +1,8 @@
+prefix=/home/admin-vras/aloam_ws/install
+
+Name: csiro_data61_dtr_sensor_config_2
+Description: Description of csiro_data61_dtr_sensor_config_2
+Version: 0.0.1
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

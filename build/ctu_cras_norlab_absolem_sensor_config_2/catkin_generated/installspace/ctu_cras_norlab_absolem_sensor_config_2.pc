@@ -1,0 +1,8 @@
+prefix=/home/admin-vras/aloam_ws/install
+
+Name: ctu_cras_norlab_absolem_sensor_config_2
+Description: Description of ctu_cras_norlab_absolem_sensor_config_2
+Version: 1.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

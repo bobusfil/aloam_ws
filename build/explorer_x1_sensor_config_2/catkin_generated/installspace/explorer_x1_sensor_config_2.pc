@@ -1,0 +1,8 @@
+prefix=/home/admin-vras/aloam_ws/install
+
+Name: explorer_x1_sensor_config_2
+Description: Description of explorer_x1_sensor_config_2
+Version: 0.0.1
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 
