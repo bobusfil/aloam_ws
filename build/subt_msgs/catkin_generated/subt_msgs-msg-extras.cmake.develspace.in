@@ -1,0 +1,2 @@
+set(subt_msgs_MESSAGE_FILES "")
+set(subt_msgs_SERVICE_FILES "/home/admin-vras/aloam_ws/src/subt/subt_msgs/srv/DatagramRos.srv;/home/admin-vras/aloam_ws/src/subt/subt_msgs/srv/Bind.srv;/home/admin-vras/aloam_ws/src/subt/subt_msgs/srv/SetPose.srv;/home/admin-vras/aloam_ws/src/subt/subt_msgs/srv/SetRate.srv;/home/admin-vras/aloam_ws/src/subt/subt_msgs/srv/PoseFromArtifact.srv;/home/admin-vras/aloam_ws/src/subt/subt_msgs/srv/Register.srv;/home/admin-vras/aloam_ws/src/subt/subt_msgs/srv/Unregister.srv")

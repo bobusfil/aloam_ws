@@ -1,0 +1,8 @@
+prefix=/home/admin-vras/aloam_ws/install
+
+Name: subt_ign
+Description: Description of subt_ign
+Version: 0.1.0
+Cflags: -I${prefix}/include
+Libs: -L${prefix}/lib -lSubtProtobuf
+Requires: subt_rf_interface subt_communication_model subt_communication_broker

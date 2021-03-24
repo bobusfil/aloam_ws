@@ -1,0 +1,8 @@
+prefix=/home/admin-vras/aloam_ws/install
+
+Name: subt_communication_model
+Description: Description of subt_communication_model
+Version: 0.1.0
+Cflags: -I${prefix}/include
+Libs: -L${prefix}/lib -lsubt_communication_model
+Requires: subt_rf_interface

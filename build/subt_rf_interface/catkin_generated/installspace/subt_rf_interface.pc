@@ -1,0 +1,8 @@
+prefix=/home/admin-vras/aloam_ws/install
+
+Name: subt_rf_interface
+Description: Description of subt_rf_interface
+Version: 0.1.0
+Cflags: -I${prefix}/include -I/usr/include/ignition/math6
+Libs: -L${prefix}/lib -lsubt_rf_range_model /usr/lib/x86_64-linux-gnu/libignition-math6.so.6.7.0
+Requires: geometry_msgs

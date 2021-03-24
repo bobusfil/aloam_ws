@@ -1,0 +1,8 @@
+prefix=/home/admin-vras/aloam_ws/install
+
+Name: sophisticated_engineering_x2_sensor_config_1
+Description: Description of sophisticated_engineering_x2_sensor_config_1
+Version: 0.1.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 
